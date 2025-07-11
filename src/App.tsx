@@ -286,7 +286,7 @@ const HealthMetric: React.FC<{
   return (
     <div className={`p-3 rounded-lg border ${variantStyles[variant]} ${className}`}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 min-w-0 flex-1">
           <div className="flex-shrink-0">
             {icon}
           </div>
@@ -322,30 +322,30 @@ const SprintCard: React.FC<{ board: Board }> = ({ board }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200">
       {/* Sprint Header */}
-      <div className="p-4 border-b border-slate-100">
-        <div className="flex items-start justify-between">
+      <div className="p-4 sm:p-6 border-b border-slate-100">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-3 sm:space-y-0">
           <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-3 mb-2">
               <div className={`w-3 h-3 rounded-full ${getStatusColor(board.health.status)} flex-shrink-0`}></div>
-              <h3 className="text-lg font-semibold text-slate-900 truncate">{board.sprint}</h3>
-              <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getUnderstandingColor(board.health.sprintUnderstanding)}`}>
-                {board.health.sprintUnderstanding} Level
-              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-slate-900 truncate">{board.sprint}</h3>
             </div>
-            <p className="text-sm text-slate-600 mb-2 line-clamp-2">{board.health.sprintGoal}</p>
+            <p className="text-sm text-slate-600 mb-3 line-clamp-2">{board.health.sprintGoal}</p>
             <div className="flex items-center text-xs text-slate-500">
               <Calendar className="w-3 h-3 mr-1 flex-shrink-0" />
               <span className="truncate">{board.health.sprintDates}</span>
             </div>
           </div>
+          <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getUnderstandingColor(board.health.sprintUnderstanding)} flex-shrink-0`}>
+            {board.health.sprintUnderstanding} Level
+          </div>
         </div>
       </div>
 
       {/* Board Info */}
-      <div className="p-4 border-b border-slate-100">
-        <div className="flex items-center justify-between mb-3">
+      <div className="p-4 sm:p-6 border-b border-slate-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0 mb-4">
           <div className="flex-1 min-w-0">
-            <h4 className="text-base font-semibold text-slate-900 truncate">{board.name}</h4>
+            <h4 className="text-base sm:text-lg font-semibold text-slate-900 truncate">{board.name}</h4>
             <p className="text-sm text-slate-600 truncate">{board.projectManager}</p>
           </div>
           <div className="flex items-center space-x-2 flex-shrink-0">
@@ -356,60 +356,60 @@ const SprintCard: React.FC<{ board: Board }> = ({ board }) => {
         </div>
         
         <div className="grid grid-cols-2 gap-3">
-          <div className="text-center p-2 bg-blue-50 rounded-lg">
-            <div className="text-lg font-bold text-blue-600">{board.totalIssues}</div>
+          <div className="text-center p-3 bg-blue-50 rounded-lg">
+            <div className="text-lg sm:text-xl font-bold text-blue-600">{board.totalIssues}</div>
             <div className="text-xs text-blue-600 font-medium">Total Issues</div>
           </div>
-          <div className="text-center p-2 bg-amber-50 rounded-lg">
-            <div className="text-lg font-bold text-amber-600">{board.remainingIssues}</div>
+          <div className="text-center p-3 bg-amber-50 rounded-lg">
+            <div className="text-lg sm:text-xl font-bold text-amber-600">{board.remainingIssues}</div>
             <div className="text-xs text-amber-600 font-medium">Remaining</div>
           </div>
         </div>
       </div>
 
       {/* Health Metrics */}
-      <div className="p-4">
-        <h5 className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-3">Health Metrics</h5>
-        <div className="grid grid-cols-2 gap-2">
+      <div className="p-4 sm:p-6">
+        <h5 className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-4">Health Metrics</h5>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <HealthMetric
             label="Velocity"
             value={`${board.health.velocity}%`}
-            icon={<TrendingUp className="w-3 h-3" />}
+            icon={<TrendingUp className="w-4 h-4" />}
             variant={board.health.velocity >= 80 ? 'success' : board.health.velocity >= 60 ? 'warning' : 'error'}
           />
           
           <HealthMetric
             label="Blockers"
             value={board.health.blockers}
-            icon={<AlertTriangle className="w-3 h-3" />}
+            icon={<AlertTriangle className="w-4 h-4" />}
             variant={board.health.blockers === 0 ? 'success' : board.health.blockers <= 3 ? 'warning' : 'error'}
           />
           
           <HealthMetric
             label="Overdue"
             value={board.health.overdue}
-            icon={<XCircle className="w-3 h-3" />}
+            icon={<XCircle className="w-4 h-4" />}
             variant={board.health.overdue === 0 ? 'success' : board.health.overdue <= 2 ? 'warning' : 'error'}
           />
           
           <HealthMetric
-            label="E/S Rate"
+            label="Estimation"
             value={`${board.health.estimationAccuracy}%`}
-            icon={<Target className="w-3 h-3" />}
+            icon={<Target className="w-4 h-4" />}
             variant={board.health.estimationAccuracy >= 85 ? 'success' : board.health.estimationAccuracy >= 70 ? 'warning' : 'error'}
           />
           
           <HealthMetric
-            label="Docs"
+            label="Documentation"
             value={board.health.documentation}
-            icon={<FileText className="w-3 h-3" />}
+            icon={<FileText className="w-4 h-4" />}
             variant="info"
           />
           
           <HealthMetric
             label="Defects"
             value={board.health.defectRemovalRate}
-            icon={<Bug className="w-3 h-3" />}
+            icon={<Bug className="w-4 h-4" />}
             variant={board.health.defectRemovalRate <= 2 ? 'success' : board.health.defectRemovalRate <= 4 ? 'warning' : 'error'}
           />
         </div>
@@ -438,18 +438,18 @@ const WeeklyMetricsCard: React.FC<{ board: Board }> = ({ board }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-      <div className="p-4 border-b border-slate-100">
+      <div className="p-4 sm:p-6 border-b border-slate-100">
         <h4 className="text-sm font-semibold text-slate-900">Weekly Metrics</h4>
-        <p className="text-xs text-slate-600 mt-1">{board.name}</p>
+        <p className="text-xs text-slate-600 mt-1 truncate">{board.name}</p>
       </div>
       
-      <div className="p-4 space-y-3">
+      <div className="p-4 sm:p-6 space-y-4">
         {weeks.map((week) => (
-          <div key={week.key} className={`rounded-lg p-3 border ${getColorClasses(week.color)}`}>
-            <div className="flex items-center justify-between mb-2">
+          <div key={week.key} className={`rounded-lg p-4 border ${getColorClasses(week.color)}`}>
+            <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-bold">{week.label}</span>
-                <span className="text-xs opacity-75">({week.dates})</span>
+                <span className="text-xs opacity-75 hidden sm:inline">({week.dates})</span>
               </div>
               <span className="text-xs font-medium">Dev: {week.data.devCount}</span>
             </div>
@@ -503,53 +503,53 @@ const ManagerCard: React.FC<{ em: EngineeringManager }> = ({ em }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200">
-      <div className="p-6">
-        <div className="flex items-start space-x-4 mb-4">
-          <div className="relative flex-shrink-0">
+      <div className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
+          <div className="relative flex-shrink-0 self-center sm:self-start">
             <img 
               src={em.avatar} 
               alt={em.name}
-              className="w-12 h-12 rounded-lg object-cover border border-slate-200"
+              className="w-16 h-16 sm:w-12 sm:h-12 rounded-lg object-cover border border-slate-200"
             />
             <div className={`absolute -top-1 -right-1 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold ${getRatingColor(em.understandingLevel)}`}>
               {em.understandingLevel}
             </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-slate-900 truncate">{em.name}</h3>
+          <div className="flex-1 min-w-0 text-center sm:text-left">
+            <h3 className="text-lg sm:text-xl font-semibold text-slate-900 truncate">{em.name}</h3>
             <p className="text-sm text-slate-600 truncate">{em.title}</p>
-            <div className="flex items-center mt-1">
+            <div className="flex items-center justify-center sm:justify-start mt-1">
               <Building2 className="w-3 h-3 text-slate-400 mr-1 flex-shrink-0" />
               <span className="text-xs text-slate-500 truncate">{em.department}</span>
             </div>
           </div>
         </div>
         
-        <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-slate-50 rounded-lg p-3">
-              <div className="flex items-center space-x-2 mb-1">
-                <Briefcase className="w-3 h-3 text-slate-500 flex-shrink-0" />
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-slate-50 rounded-lg p-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <Briefcase className="w-4 h-4 text-slate-500 flex-shrink-0" />
                 <span className="text-xs font-medium text-slate-700 truncate">Experience</span>
               </div>
               <div className="text-sm font-semibold text-slate-900">{em.experience}</div>
             </div>
             
-            <div className="bg-slate-50 rounded-lg p-3">
-              <div className="flex items-center space-x-2 mb-1">
-                <Clock className="w-3 h-3 text-slate-500 flex-shrink-0" />
-                <span className="text-xs font-medium text-slate-700 truncate">Target A</span>
+            <div className="bg-slate-50 rounded-lg p-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <Clock className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                <span className="text-xs font-medium text-slate-700 truncate">Target A Level</span>
               </div>
-              <div className="text-xs font-semibold text-slate-900">{formatDate(em.understandingTargetDate)}</div>
+              <div className="text-sm font-semibold text-slate-900">{formatDate(em.understandingTargetDate)}</div>
             </div>
           </div>
           
-          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
             <div className="flex items-center space-x-2">
               <Users className="w-4 h-4 text-slate-500 flex-shrink-0" />
               <span className="text-sm text-slate-700">{em.teamsCount} Teams</span>
             </div>
-            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
               {em.boards.length} Boards
             </span>
           </div>
@@ -581,8 +581,8 @@ function App() {
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-            <div>
+          <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-center sm:text-left">
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Engineering Dashboard</h1>
               <p className="text-slate-600 text-sm sm:text-base mt-1">Board of Boards Overview • Real-time Engineering Metrics</p>
             </div>
@@ -614,29 +614,21 @@ function App() {
         ) : (
           <div className="space-y-8">
             {filteredData.map((em) => (
-              <div key={em.id} className="bg-white rounded-xl shadow-sm border border-slate-200">
-                <div className="p-6">
-                  {/* Manager Header */}
-                  <div className="mb-6">
-                    <ManagerCard em={em} />
-                  </div>
+              <div key={em.id} className="space-y-6">
+                {/* Manager Card */}
+                <ManagerCard em={em} />
 
-                  {/* Boards Grid */}
-                  <div className="space-y-6">
-                    {em.boards.map((board) => (
-                      <div key={board.id} className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                        {/* Sprint Card */}
-                        <div className="lg:col-span-1">
-                          <SprintCard board={board} />
-                        </div>
-
-                        {/* Weekly Metrics */}
-                        <div className="lg:col-span-1 xl:col-span-2">
-                          <WeeklyMetricsCard board={board} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                {/* Boards - Stacked Vertically */}
+                <div className="space-y-6">
+                  {em.boards.map((board) => (
+                    <div key={board.id} className="space-y-6">
+                      {/* Sprint Card */}
+                      <SprintCard board={board} />
+                      
+                      {/* Weekly Metrics */}
+                      <WeeklyMetricsCard board={board} />
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
