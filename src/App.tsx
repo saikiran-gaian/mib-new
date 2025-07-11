@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Users, Activity, TrendingUp, AlertTriangle, CheckCircle, XCircle, Search, Calendar, Award, Building2, Clock, Target, BarChart3, GitBranch, FileText, Bug, Zap, Shield, Timer, Gauge } from 'lucide-react';
+import { Users, Activity, TrendingUp, AlertTriangle, CheckCircle, XCircle, Search, Calendar, Award, Building2, Clock, Target, BarChart3, GitBranch, FileText, Bug, Zap, Shield, Timer, Gauge, ChevronRight, Briefcase } from 'lucide-react';
 
 interface BoardHealth {
   velocity: number;
@@ -7,24 +7,21 @@ interface BoardHealth {
   overdue: number;
   completed: number;
   status: 'healthy' | 'warning' | 'critical';
-  // Additional metrics from the screenshots
   sprintGoal: string;
   sprintUnderstanding: 'A' | 'B' | 'C';
-  estimationAccuracy: number; // E/S percentage
-  documentation: number; // Doc count
-  umlDiagrams: number; // UML count
-  defectRemovalRate: number; // DRR
-  defectRemovalSprint: number; // DRS
-  defectRemovalFuture: number; // DRF
+  estimationAccuracy: number;
+  documentation: number;
+  umlDiagrams: number;
+  defectRemovalRate: number;
+  defectRemovalSprint: number;
+  defectRemovalFuture: number;
   devCount: number;
-  // Sprint metrics
   sprintDates: string;
-  backlogItems: number; // BL
-  doneRatio: number; // DR
-  doneGoals: number; // DG
-  pendingDeployment: number; // PD
-  productionLive: number; // PL
-  // Weekly metrics (W1, W2, W3, W4)
+  backlogItems: number;
+  doneRatio: number;
+  doneGoals: number;
+  pendingDeployment: number;
+  productionLive: number;
   w1: { bl: number; dr: number; dg: number; pd: number; pl: number; devCount: number };
   w2: { bl: number; dr: number; dg: number; pd: number; pl: number; devCount: number };
   w3: { bl: number; dr: number; dg: number; pd: number; pl: number; devCount: number };
@@ -272,42 +269,38 @@ const mockData: EngineeringManager[] = [
   }
 ];
 
-const HealthTile: React.FC<{ label: string; value: number | string; icon: React.ReactNode; variant: 'success' | 'warning' | 'error' | 'info' }> = ({
-  label,
-  value,
-  icon,
-  variant
-}) => {
+const HealthMetric: React.FC<{ 
+  label: string; 
+  value: number | string; 
+  icon: React.ReactNode; 
+  variant: 'success' | 'warning' | 'error' | 'info';
+  className?: string;
+}> = ({ label, value, icon, variant, className = "" }) => {
   const variantStyles = {
-    success: 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300',
-    warning: 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100 hover:border-amber-300',
-    error: 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300',
-    info: 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300'
+    success: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+    warning: 'bg-amber-50 border-amber-200 text-amber-700',
+    error: 'bg-red-50 border-red-200 text-red-700',
+    info: 'bg-blue-50 border-blue-200 text-blue-700'
   };
 
   return (
-    <div className={`p-4 rounded-xl border-2 ${variantStyles[variant]} transition-all duration-200 hover:shadow-lg hover:scale-105`}>
-      <div className="flex items-center space-x-3">
-        <div className="p-2 rounded-lg bg-white/80 flex-shrink-0 shadow-sm">
-          {icon}
-        </div>
-        <div className="flex-1">
-          <div className="text-xs font-bold uppercase tracking-wide opacity-80">{label}</div>
-          <div className="text-xl font-bold">{value}</div>
+    <div className={`p-3 rounded-lg border ${variantStyles[variant]} ${className}`}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <div className="flex-shrink-0">
+            {icon}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-xs font-medium uppercase tracking-wide opacity-75 truncate">{label}</div>
+            <div className="text-sm font-bold truncate">{value}</div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-const WeeklyMetricCell: React.FC<{ value: number; label: string }> = ({ value, label }) => (
-  <div className="text-center">
-    <div className="text-sm font-bold text-slate-800">{value}</div>
-    <div className="text-xs text-slate-500 uppercase tracking-wide">{label}</div>
-  </div>
-);
-
-const BoardRow: React.FC<{ board: Board }> = ({ board }) => {
+const SprintCard: React.FC<{ board: Board }> = ({ board }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'healthy': return 'bg-emerald-500';
@@ -327,233 +320,170 @@ const BoardRow: React.FC<{ board: Board }> = ({ board }) => {
   };
 
   return (
-    <div className="mb-6">
-      <div className="flex gap-6">
-        {/* Board Info Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 hover:shadow-xl transition-all duration-300 hover:border-blue-300 group flex-shrink-0 w-80">
-          <div className="flex items-start space-x-3">
-            <div className={`w-4 h-4 rounded-full ${getStatusColor(board.health.status)} shadow-sm mt-1 flex-shrink-0`}></div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
-                {board.name}
-              </h3>
-              <div className="flex items-center space-x-2 mt-1">
-                <span className="text-sm font-semibold text-slate-700 bg-slate-100 px-2 py-1 rounded-full">
-                  {board.project}
-                </span>
-              </div>
-              <div className="text-sm text-slate-600 mt-2">{board.projectManager}</div>
-              <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold border mt-2 ${getUnderstandingColor(board.health.sprintUnderstanding)}`}>
-                Level {board.health.sprintUnderstanding}
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200">
+      {/* Sprint Header */}
+      <div className="p-4 border-b border-slate-100">
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center space-x-3 mb-2">
+              <div className={`w-3 h-3 rounded-full ${getStatusColor(board.health.status)} flex-shrink-0`}></div>
+              <h3 className="text-lg font-semibold text-slate-900 truncate">{board.sprint}</h3>
+              <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getUnderstandingColor(board.health.sprintUnderstanding)}`}>
+                {board.health.sprintUnderstanding} Level
               </div>
             </div>
+            <p className="text-sm text-slate-600 mb-2 line-clamp-2">{board.health.sprintGoal}</p>
+            <div className="flex items-center text-xs text-slate-500">
+              <Calendar className="w-3 h-3 mr-1 flex-shrink-0" />
+              <span className="truncate">{board.health.sprintDates}</span>
+            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Board Info */}
+      <div className="p-4 border-b border-slate-100">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex-1 min-w-0">
+            <h4 className="text-base font-semibold text-slate-900 truncate">{board.name}</h4>
+            <p className="text-sm text-slate-600 truncate">{board.projectManager}</p>
+          </div>
+          <div className="flex items-center space-x-2 flex-shrink-0">
+            <span className="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-medium">
+              {board.project}
+            </span>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-center p-2 bg-blue-50 rounded-lg">
+            <div className="text-lg font-bold text-blue-600">{board.totalIssues}</div>
+            <div className="text-xs text-blue-600 font-medium">Total Issues</div>
+          </div>
+          <div className="text-center p-2 bg-amber-50 rounded-lg">
+            <div className="text-lg font-bold text-amber-600">{board.remainingIssues}</div>
+            <div className="text-xs text-amber-600 font-medium">Remaining</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Health Metrics */}
+      <div className="p-4">
+        <h5 className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-3">Health Metrics</h5>
+        <div className="grid grid-cols-2 gap-2">
+          <HealthMetric
+            label="Velocity"
+            value={`${board.health.velocity}%`}
+            icon={<TrendingUp className="w-3 h-3" />}
+            variant={board.health.velocity >= 80 ? 'success' : board.health.velocity >= 60 ? 'warning' : 'error'}
+          />
           
-          <div className="mt-4 pt-4 border-t border-slate-200">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{board.totalIssues}</div>
-                <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Total Issues</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-amber-600">{board.remainingIssues}</div>
-                <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Remaining</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Weekly Metrics Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 hover:shadow-xl transition-all duration-300 hover:border-blue-300 flex-1">
-          <h4 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wide text-center">Weekly Metrics</h4>
-          <div className="space-y-3">
-            {/* W1 */}
-            <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-xl p-4 border border-indigo-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="text-sm font-bold text-indigo-800 uppercase tracking-wide">W1</div>
-                  <div className="text-xs text-indigo-600">(Jul 14th - Jul 18th)</div>
-                  <div className="text-sm font-bold text-indigo-700">Dev: {board.health.w1.devCount}</div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-indigo-800">{board.health.w1.bl}</div>
-                    <div className="text-xs text-indigo-600 uppercase">BL</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-indigo-800">{board.health.w1.dr}</div>
-                    <div className="text-xs text-indigo-600 uppercase">DR</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-indigo-800">{board.health.w1.dg}</div>
-                    <div className="text-xs text-indigo-600 uppercase">DG</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-indigo-800">{board.health.w1.pd}</div>
-                    <div className="text-xs text-indigo-600 uppercase">PD</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-indigo-800">{board.health.w1.pl}</div>
-                    <div className="text-xs text-indigo-600 uppercase">PL</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* W2 */}
-            <div className="bg-gradient-to-r from-cyan-50 to-cyan-100 rounded-xl p-4 border border-cyan-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="text-sm font-bold text-cyan-800 uppercase tracking-wide">W2</div>
-                  <div className="text-xs text-cyan-600">(Jul 21st - Jul 25th)</div>
-                  <div className="text-sm font-bold text-cyan-700">Dev: {board.health.w2.devCount}</div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-cyan-800">{board.health.w2.bl}</div>
-                    <div className="text-xs text-cyan-600 uppercase">BL</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-cyan-800">{board.health.w2.dr}</div>
-                    <div className="text-xs text-cyan-600 uppercase">DR</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-cyan-800">{board.health.w2.dg}</div>
-                    <div className="text-xs text-cyan-600 uppercase">DG</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-cyan-800">{board.health.w2.pd}</div>
-                    <div className="text-xs text-cyan-600 uppercase">PD</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-cyan-800">{board.health.w2.pl}</div>
-                    <div className="text-xs text-cyan-600 uppercase">PL</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* W3 */}
-            <div className="bg-gradient-to-r from-teal-50 to-teal-100 rounded-xl p-4 border border-teal-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="text-sm font-bold text-teal-800 uppercase tracking-wide">W3</div>
-                  <div className="text-xs text-teal-600">(Jul 28th - Aug 1st)</div>
-                  <div className="text-sm font-bold text-teal-700">Dev: {board.health.w3.devCount}</div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-teal-800">{board.health.w3.bl}</div>
-                    <div className="text-xs text-teal-600 uppercase">BL</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-teal-800">{board.health.w3.dr}</div>
-                    <div className="text-xs text-teal-600 uppercase">DR</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-teal-800">{board.health.w3.dg}</div>
-                    <div className="text-xs text-teal-600 uppercase">DG</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-teal-800">{board.health.w3.pd}</div>
-                    <div className="text-xs text-teal-600 uppercase">PD</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-teal-800">{board.health.w3.pl}</div>
-                    <div className="text-xs text-teal-600 uppercase">PL</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* W4 */}
-            <div className="bg-gradient-to-r from-rose-50 to-rose-100 rounded-xl p-4 border border-rose-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="text-sm font-bold text-rose-800 uppercase tracking-wide">W4</div>
-                  <div className="text-xs text-rose-600">(Aug 4th - Aug 8th)</div>
-                  <div className="text-sm font-bold text-rose-700">Dev: {board.health.w4.devCount}</div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-rose-800">{board.health.w4.bl}</div>
-                    <div className="text-xs text-rose-600 uppercase">BL</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-rose-800">{board.health.w4.dr}</div>
-                    <div className="text-xs text-rose-600 uppercase">DR</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-rose-800">{board.health.w4.dg}</div>
-                    <div className="text-xs text-rose-600 uppercase">DG</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-rose-800">{board.health.w4.pd}</div>
-                    <div className="text-xs text-rose-600 uppercase">PD</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-rose-800">{board.health.w4.pl}</div>
-                    <div className="text-xs text-rose-600 uppercase">PL</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Health Metrics Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 hover:shadow-xl transition-all duration-300 hover:border-blue-300 flex-shrink-0 w-96">
-          <h4 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wide text-center">Health Metrics</h4>
-          <div className="grid grid-cols-3 gap-3">
-            <HealthTile
-              label="Velocity"
-              value={`${board.health.velocity}%`}
-              icon={<TrendingUp className="w-3 h-3" />}
-              variant={board.health.velocity >= 80 ? 'success' : board.health.velocity >= 60 ? 'warning' : 'error'}
-            />
-            
-            <HealthTile
-              label="Blockers"
-              value={board.health.blockers}
-              icon={<AlertTriangle className="w-3 h-3" />}
-              variant={board.health.blockers === 0 ? 'success' : board.health.blockers <= 3 ? 'warning' : 'error'}
-            />
-            
-            <HealthTile
-              label="Overdue"
-              value={board.health.overdue}
-              icon={<XCircle className="w-3 h-3" />}
-              variant={board.health.overdue === 0 ? 'success' : board.health.overdue <= 2 ? 'warning' : 'error'}
-            />
-            
-            <HealthTile
-              label="E/S Rate"
-              value={`${board.health.estimationAccuracy}%`}
-              icon={<Target className="w-3 h-3" />}
-              variant={board.health.estimationAccuracy >= 85 ? 'success' : board.health.estimationAccuracy >= 70 ? 'warning' : 'error'}
-            />
-            
-            <HealthTile
-              label="Docs"
-              value={board.health.documentation}
-              icon={<FileText className="w-3 h-3" />}
-              variant="info"
-            />
-            
-            <HealthTile
-              label="Defects"
-              value={board.health.defectRemovalRate}
-              icon={<Bug className="w-3 h-3" />}
-              variant={board.health.defectRemovalRate <= 2 ? 'success' : board.health.defectRemovalRate <= 4 ? 'warning' : 'error'}
-            />
-          </div>
+          <HealthMetric
+            label="Blockers"
+            value={board.health.blockers}
+            icon={<AlertTriangle className="w-3 h-3" />}
+            variant={board.health.blockers === 0 ? 'success' : board.health.blockers <= 3 ? 'warning' : 'error'}
+          />
+          
+          <HealthMetric
+            label="Overdue"
+            value={board.health.overdue}
+            icon={<XCircle className="w-3 h-3" />}
+            variant={board.health.overdue === 0 ? 'success' : board.health.overdue <= 2 ? 'warning' : 'error'}
+          />
+          
+          <HealthMetric
+            label="E/S Rate"
+            value={`${board.health.estimationAccuracy}%`}
+            icon={<Target className="w-3 h-3" />}
+            variant={board.health.estimationAccuracy >= 85 ? 'success' : board.health.estimationAccuracy >= 70 ? 'warning' : 'error'}
+          />
+          
+          <HealthMetric
+            label="Docs"
+            value={board.health.documentation}
+            icon={<FileText className="w-3 h-3" />}
+            variant="info"
+          />
+          
+          <HealthMetric
+            label="Defects"
+            value={board.health.defectRemovalRate}
+            icon={<Bug className="w-3 h-3" />}
+            variant={board.health.defectRemovalRate <= 2 ? 'success' : board.health.defectRemovalRate <= 4 ? 'warning' : 'error'}
+          />
         </div>
       </div>
     </div>
   );
 };
 
-const EMCard: React.FC<{ em: EngineeringManager }> = ({ em }) => {
+const WeeklyMetricsCard: React.FC<{ board: Board }> = ({ board }) => {
+  const weeks = [
+    { key: 'w1', label: 'W1', data: board.health.w1, dates: 'Jul 14-18', color: 'indigo' },
+    { key: 'w2', label: 'W2', data: board.health.w2, dates: 'Jul 21-25', color: 'cyan' },
+    { key: 'w3', label: 'W3', data: board.health.w3, dates: 'Jul 28-Aug 1', color: 'teal' },
+    { key: 'w4', label: 'W4', data: board.health.w4, dates: 'Aug 4-8', color: 'rose' }
+  ];
+
+  const getColorClasses = (color: string) => {
+    const colors = {
+      indigo: 'bg-indigo-50 border-indigo-200 text-indigo-800',
+      cyan: 'bg-cyan-50 border-cyan-200 text-cyan-800',
+      teal: 'bg-teal-50 border-teal-200 text-teal-800',
+      rose: 'bg-rose-50 border-rose-200 text-rose-800'
+    };
+    return colors[color as keyof typeof colors] || colors.indigo;
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+      <div className="p-4 border-b border-slate-100">
+        <h4 className="text-sm font-semibold text-slate-900">Weekly Metrics</h4>
+        <p className="text-xs text-slate-600 mt-1">{board.name}</p>
+      </div>
+      
+      <div className="p-4 space-y-3">
+        {weeks.map((week) => (
+          <div key={week.key} className={`rounded-lg p-3 border ${getColorClasses(week.color)}`}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-bold">{week.label}</span>
+                <span className="text-xs opacity-75">({week.dates})</span>
+              </div>
+              <span className="text-xs font-medium">Dev: {week.data.devCount}</span>
+            </div>
+            
+            <div className="grid grid-cols-5 gap-2 text-center">
+              <div>
+                <div className="text-sm font-bold">{week.data.bl}</div>
+                <div className="text-xs opacity-75">BL</div>
+              </div>
+              <div>
+                <div className="text-sm font-bold">{week.data.dr}</div>
+                <div className="text-xs opacity-75">DR</div>
+              </div>
+              <div>
+                <div className="text-sm font-bold">{week.data.dg}</div>
+                <div className="text-xs opacity-75">DG</div>
+              </div>
+              <div>
+                <div className="text-sm font-bold">{week.data.pd}</div>
+                <div className="text-xs opacity-75">PD</div>
+              </div>
+              <div>
+                <div className="text-sm font-bold">{week.data.pl}</div>
+                <div className="text-xs opacity-75">PL</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const ManagerCard: React.FC<{ em: EngineeringManager }> = ({ em }) => {
   const getRatingColor = (rating: string) => {
     switch (rating) {
       case 'A': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
@@ -572,63 +502,57 @@ const EMCard: React.FC<{ em: EngineeringManager }> = ({ em }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 hover:shadow-xl transition-all duration-300 hover:border-blue-300 group">
-      <div className="flex items-start space-x-4 mb-6">
-        <div className="relative">
-          <img 
-            src={em.avatar} 
-            alt={em.name}
-            className="w-16 h-16 rounded-2xl object-cover border-2 border-blue-100 group-hover:border-blue-200 transition-colors shadow-md"
-          />
-          <div className={`absolute -top-2 -right-2 w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-sm font-bold ${getRatingColor(em.understandingLevel)} shadow-lg`}>
-            {em.understandingLevel}
-          </div>
-        </div>
-        <div className="flex-1">
-          <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{em.name}</h3>
-          <p className="text-sm font-semibold text-slate-600 mb-2">{em.title}</p>
-          <div className="flex items-center space-x-2">
-            <Building2 className="w-4 h-4 text-slate-400" />
-            <span className="text-sm text-slate-600">{em.department}</span>
-          </div>
-        </div>
-      </div>
-      
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 gap-3">
-          <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
-            <div className="flex items-center space-x-2 mb-2">
-              <Calendar className="w-4 h-4 text-slate-500" />
-              <span className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Experience</span>
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200">
+      <div className="p-6">
+        <div className="flex items-start space-x-4 mb-4">
+          <div className="relative flex-shrink-0">
+            <img 
+              src={em.avatar} 
+              alt={em.name}
+              className="w-12 h-12 rounded-lg object-cover border border-slate-200"
+            />
+            <div className={`absolute -top-1 -right-1 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold ${getRatingColor(em.understandingLevel)}`}>
+              {em.understandingLevel}
             </div>
-            <div className="text-lg font-bold text-slate-900">{em.experience}</div>
           </div>
-          
-          <div className="bg-gradient-to-r from-slate-50 to-purple-50 rounded-xl p-4 border border-slate-200">
-            <div className="flex items-center space-x-2 mb-2">
-              <Award className="w-4 h-4 text-slate-500" />
-              <span className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Understanding Level</span>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-semibold text-slate-900 truncate">{em.name}</h3>
+            <p className="text-sm text-slate-600 truncate">{em.title}</p>
+            <div className="flex items-center mt-1">
+              <Building2 className="w-3 h-3 text-slate-400 mr-1 flex-shrink-0" />
+              <span className="text-xs text-slate-500 truncate">{em.department}</span>
             </div>
-            <div className="text-lg font-bold text-slate-900">Level {em.understandingLevel}</div>
-          </div>
-          
-          <div className="bg-gradient-to-r from-slate-50 to-amber-50 rounded-xl p-4 border border-slate-200">
-            <div className="flex items-center space-x-2 mb-2">
-              <Clock className="w-4 h-4 text-slate-500" />
-              <span className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Target Date to A</span>
-            </div>
-            <div className="text-sm font-bold text-slate-900">{formatDate(em.understandingTargetDate)}</div>
           </div>
         </div>
         
-        <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-          <div className="flex items-center space-x-2">
-            <Users className="w-4 h-4 text-slate-500" />
-            <span className="text-sm font-semibold text-slate-700">{em.teamsCount} Teams</span>
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-slate-50 rounded-lg p-3">
+              <div className="flex items-center space-x-2 mb-1">
+                <Briefcase className="w-3 h-3 text-slate-500 flex-shrink-0" />
+                <span className="text-xs font-medium text-slate-700 truncate">Experience</span>
+              </div>
+              <div className="text-sm font-semibold text-slate-900">{em.experience}</div>
+            </div>
+            
+            <div className="bg-slate-50 rounded-lg p-3">
+              <div className="flex items-center space-x-2 mb-1">
+                <Clock className="w-3 h-3 text-slate-500 flex-shrink-0" />
+                <span className="text-xs font-medium text-slate-700 truncate">Target A</span>
+              </div>
+              <div className="text-xs font-semibold text-slate-900">{formatDate(em.understandingTargetDate)}</div>
+            </div>
           </div>
-          <span className="bg-blue-100 text-blue-800 px-3 py-2 rounded-full text-sm font-bold border border-blue-200">
-            {em.boards.length} Boards
-          </span>
+          
+          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+            <div className="flex items-center space-x-2">
+              <Users className="w-4 h-4 text-slate-500 flex-shrink-0" />
+              <span className="text-sm text-slate-700">{em.teamsCount} Teams</span>
+            </div>
+            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+              {em.boards.length} Boards
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -653,27 +577,27 @@ function App() {
   }, [searchTerm]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="bg-white shadow-lg border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-between">
+      <div className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div>
-              <h1 className="text-4xl font-bold text-slate-900 mb-2">Engineering Dashboard</h1>
-              <p className="text-slate-600 text-lg">Board of Boards Overview • Real-time Engineering Metrics</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Engineering Dashboard</h1>
+              <p className="text-slate-600 text-sm sm:text-base mt-1">Board of Boards Overview • Real-time Engineering Metrics</p>
             </div>
             
             {/* Search Box */}
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-slate-400" />
+            <div className="relative w-full sm:w-80">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-slate-400" />
               </div>
               <input
                 type="text"
-                placeholder="Search engineering managers, teams, or boards..."
+                placeholder="Search managers, teams, or boards..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-96 pl-12 pr-4 py-4 border border-slate-300 rounded-2xl leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
+                className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
             </div>
           </div>
@@ -681,29 +605,37 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {filteredData.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-slate-400 text-xl">No results found for "{searchTerm}"</div>
             <p className="text-slate-500 mt-2">Try adjusting your search terms</p>
           </div>
         ) : (
-          <div className="space-y-12">
+          <div className="space-y-8">
             {filteredData.map((em) => (
-              <div key={em.id} className="bg-white rounded-3xl shadow-xl border border-slate-200 p-8 hover:shadow-2xl transition-all duration-300">
-                <div className="grid grid-cols-12 gap-8">
-                  {/* Engineering Manager Card */}
-                  <div className="col-span-12 lg:col-span-3">
-                    <EMCard em={em} />
+              <div key={em.id} className="bg-white rounded-xl shadow-sm border border-slate-200">
+                <div className="p-6">
+                  {/* Manager Header */}
+                  <div className="mb-6">
+                    <ManagerCard em={em} />
                   </div>
 
-                  {/* Boards Section */}
-                  <div className="col-span-12 lg:col-span-9">
-                    <div className="space-y-6">
-                      {em.boards.map((board) => (
-                        <BoardRow key={board.id} board={board} />
-                      ))}
-                    </div>
+                  {/* Boards Grid */}
+                  <div className="space-y-6">
+                    {em.boards.map((board) => (
+                      <div key={board.id} className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {/* Sprint Card */}
+                        <div className="lg:col-span-1">
+                          <SprintCard board={board} />
+                        </div>
+
+                        {/* Weekly Metrics */}
+                        <div className="lg:col-span-1 xl:col-span-2">
+                          <WeeklyMetricsCard board={board} />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
